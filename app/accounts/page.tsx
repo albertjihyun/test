@@ -16,7 +16,6 @@ export default function AccountsPage() {
   const {
     accountsQuery,
     createMutation,
-    updateMutation,
     deleteMutation
   } = useAccounts();
 
@@ -25,6 +24,9 @@ export default function AccountsPage() {
     accountName: '',
     balance: 0
   });
+
+  const [aliasInputs, setAliasInputs] = useState<Record<number, string>>({});
+  const [message, setMessage] = useState('');
 
   if (accountsQuery.isLoading) {
     return <main className="page">계좌 목록을 불러오는 중입니다.</main>;
@@ -46,6 +48,41 @@ export default function AccountsPage() {
       accountName: '',
       balance: 0
     });
+  }
+
+  async function handleUpdateAlias(accountId: number) {
+    const accountName = aliasInputs[accountId];
+
+    if (!accountName || accountName.trim().length < 2) {
+      alert('계좌명은 2자 이상 입력해야 합니다.');
+      return;
+    }
+
+    const response = await fetch(`/api/accounts/${accountId}/alias`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        accountName
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setMessage(data.message || '계좌 별칭 변경에 실패했습니다.');
+      return;
+    }
+
+    setMessage(data.message);
+
+    setAliasInputs({
+      ...aliasInputs,
+      [accountId]: ''
+    });
+
+    await accountsQuery.refetch();
   }
 
   return (
@@ -81,6 +118,8 @@ export default function AccountsPage() {
 
           <button type="submit">계좌 등록</button>
         </form>
+
+        {message && <p>{message}</p>}
       </section>
 
       <section className="card">
@@ -93,6 +132,7 @@ export default function AccountsPage() {
               <th>계좌명</th>
               <th>잔액</th>
               <th>상태</th>
+              <th>별칭 변경</th>
               <th>관리</th>
             </tr>
           </thead>
@@ -105,23 +145,33 @@ export default function AccountsPage() {
                   <td>{account.account_name}</td>
                   <td>{Number(account.balance).toLocaleString()}원</td>
                   <td>{account.status}</td>
+
+                  <td>
+                    <input
+                      placeholder="새 계좌명"
+                      value={aliasInputs[account.id] || ''}
+                      onChange={function (event) {
+                        setAliasInputs({
+                          ...aliasInputs,
+                          [account.id]: event.target.value
+                        });
+                      }}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={function () {
+                        handleUpdateAlias(account.id);
+                      }}
+                    >
+                      별칭 변경
+                    </button>
+                  </td>
+
                   <td>
                     <Link href={`/accounts/${account.id}`}>
                       상세
                     </Link>
-
-                    <button
-                      type="button"
-                      onClick={async function () {
-                        await updateMutation.mutateAsync({
-                          id: account.id,
-                          accountName: account.account_name + ' 수정',
-                          status: account.status
-                        });
-                      }}
-                    >
-                      수정
-                    </button>
 
                     <button
                       type="button"
@@ -135,6 +185,12 @@ export default function AccountsPage() {
                 </tr>
               );
             })}
+
+            {accounts.length === 0 && (
+              <tr>
+                <td colSpan={6}>등록된 계좌가 없습니다.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </section>
