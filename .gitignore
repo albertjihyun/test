@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Gradle / Java
+backend-spring-api/.gradle/
+backend-spring-api/build/
+backend-spring-api/out/
+*.class
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+
+# Editor
+.idea/
+.vscode/
