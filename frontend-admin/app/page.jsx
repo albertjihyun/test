@@ -49,13 +49,13 @@ export default function AdminPage() {
       <main className="auth-shell">
         <section className="auth-card">
           <div className="auth-brand">
-            <div className="brand-logo">충</div>
+            <div className="brand-logo">신</div>
             <div>
-              <p>Chungjeong Bank Admin</p>
+              <p>신선마켓 Admin</p>
               <h1>관리자 콘솔 로그인</h1>
             </div>
           </div>
-          <p className="auth-copy">회원, 계좌, 거래, Redis 감사 로그를 관리하는 PC 전용 운영 화면입니다.</p>
+          <p className="auth-copy">회원, 창고, 입출고 이력, Redis 감사 로그를 관리하는 PC 전용 운영 화면입니다.</p>
           <div className="auth-form">
             <label>관리자 ID</label>
             <input value={login.username} onChange={(e) => setLogin({ ...login, username: e.target.value })} />
@@ -75,21 +75,21 @@ export default function AdminPage() {
     <div className="admin-layout">
       <aside className="sidebar">
         <div className="side-brand">
-          <div className="brand-logo">충</div>
+          <div className="brand-logo">신</div>
           <div>
-            <strong>충정은행</strong>
+            <strong>신선마켓</strong>
             <span>Admin Console</span>
           </div>
         </div>
         <nav className="side-nav">
           <NavItem active icon="홈" label="대시보드" />
           <NavItem icon="회원" label="회원 관리" />
-          <NavItem icon="계좌" label="계좌 관리" />
-          <NavItem icon="거래" label="거래 모니터링" />
+          <NavItem icon="창고" label="창고 관리" />
+          <NavItem icon="입출고" label="입출고 모니터링" />
           <NavItem icon="로그" label="Redis 감사 로그" />
         </nav>
         <div className="side-footer">
-          <span>Next Admin 3001</span>
+          <span>신선마켓 Admin 3001</span>
           <small>GCP VM · Nginx Routed</small>
         </div>
       </aside>
@@ -97,8 +97,8 @@ export default function AdminPage() {
       <div className="workspace">
         <header className="topbar">
           <div>
-            <p className="crumb">운영 관리 / 관리자 콘솔</p>
-            <h1>관리자 업무 대시보드</h1>
+            <p className="crumb">운영 관리 / 신선마켓 입출고 대시보드</p>
+            <h1>신선마켓 입출고 대시보드</h1>
           </div>
           <div className="top-actions">
             <button className="ghost" onClick={() => dashboard.refetch()}>새로고침</button>
@@ -112,9 +112,9 @@ export default function AdminPage() {
         <main className="content">
           <section className="hero-card">
             <div>
-              <span className="hero-label">Google-style Admin UI</span>
-              <h2>금융 운영 데이터를 한 화면에서 관리합니다</h2>
-              <p>Spring Boot API, MariaDB/JPA, Redis 세션·캐시·감사 로그를 기준으로 운영 상태를 확인합니다.</p>
+              <span className="hero-label">신선마켓 유통기한 검증 아키텍처</span>
+              <h2>식품 입출고 데이터를 한 화면에서 관리합니다</h2>
+              <p>Spring Boot API, MariaDB/JPA, Redis 세션·캐시·감사 로그. 입고 시 유통기한(expiryDate)이 오늘 이하이면 400 오류가 반환됩니다.</p>
             </div>
             <div className="hero-status">
               <span>API</span>
@@ -124,9 +124,9 @@ export default function AdminPage() {
 
           <section className="metric-grid">
             <div className="metric-card"><span>회원</span><strong>{data.userCount ?? users.length}</strong><p>활성·잠금 사용자</p></div>
-            <div className="metric-card"><span>계좌</span><strong>{data.accountCount ?? accounts.length}</strong><p>생성·해지 계좌</p></div>
-            <div className="metric-card"><span>거래</span><strong>{data.transactionCount ?? transactions.length}</strong><p>최근 거래 모니터링</p></div>
-            <div className="metric-card"><span>총 잔액</span><strong>{formatMoney(totalBalance)}</strong><p>대시보드 캐시 대상</p></div>
+            <div className="metric-card"><span>창고</span><strong>{data.accountCount ?? accounts.length}</strong><p>생성·해지 창고</p></div>
+            <div className="metric-card"><span>입출고</span><strong>{data.transactionCount ?? transactions.length}</strong><p>최근 입출고 모니터링</p></div>
+            <div className="metric-card"><span>총 재고</span><strong>{formatMoney(totalBalance)}</strong><p>대시보드 캐시 대상</p></div>
           </section>
 
           <section className="operation-grid">
@@ -141,10 +141,10 @@ export default function AdminPage() {
             </div>
 
             <div className="panel">
-              <div className="panel-head"><h2>계좌 생성</h2><span>관리자 발급</span></div>
+              <div className="panel-head"><h2>창고 생성</h2><span>관리자 발급</span></div>
               <input placeholder="사용자 ID" value={account.userId} onChange={(e) => setAccount({ ...account, userId: Number(e.target.value) })} />
-              <input placeholder="초기 잔액" value={account.initialBalance} onChange={(e) => setAccount({ ...account, initialBalance: Number(e.target.value) })} />
-              <button onClick={() => createAccount.mutate(account)}>계좌 생성</button>
+              <input placeholder="초기 재고" value={account.initialBalance} onChange={(e) => setAccount({ ...account, initialBalance: Number(e.target.value) })} />
+              <button onClick={() => createAccount.mutate(account)}>창고 생성</button>
               <p className="error-text">{getErrorMessage(createAccount.error)}</p>
             </div>
 
@@ -157,12 +157,12 @@ export default function AdminPage() {
             </div>
 
             <div className="panel danger-panel">
-              <div className="panel-head"><h2>상태/계좌 해지</h2><span>위험 작업</span></div>
+              <div className="panel-head"><h2>상태/창고 해지</h2><span>위험 작업</span></div>
               <input placeholder="사용자 ID" value={status.userId} onChange={(e) => setStatus({ ...status, userId: Number(e.target.value) })} />
               <select value={status.status} onChange={(e) => setStatus({ ...status, status: e.target.value })}><option>LOCKED</option><option>ACTIVE</option></select>
               <button className="secondary" onClick={() => changeStatus.mutate({ status: status.status })}>사용자 상태 변경</button>
-              <input placeholder="해지 계좌 ID" value={closeAccount.accountId} onChange={(e) => setCloseAccount({ accountId: e.target.value })} />
-              <button className="danger" onClick={() => closeAccountMutation.mutate({})}>계좌 해지</button>
+              <input placeholder="해지 창고 ID" value={closeAccount.accountId} onChange={(e) => setCloseAccount({ accountId: e.target.value })} />
+              <button className="danger" onClick={() => closeAccountMutation.mutate({})}>창고 해지</button>
             </div>
           </section>
 
@@ -175,15 +175,15 @@ export default function AdminPage() {
             </div>
 
             <div className="table-panel wide">
-              <div className="panel-head"><h2>계좌 목록</h2><span>{accounts.length}건</span></div>
+              <div className="panel-head"><h2>창고 목록</h2><span>{accounts.length}건</span></div>
               <div className="table-wrap">
-                <table><thead><tr><th>ID</th><th>User</th><th>계좌번호</th><th>잔액</th><th>상태</th></tr></thead><tbody>{accounts.map((a) => <tr key={a.id}><td>{a.id}</td><td>{a.userId}</td><td>{a.accountNumber}</td><td>{formatMoney(a.balance)}</td><td><span className={`status ${String(a.status).toLowerCase()}`}>{String(a.status)}</span></td></tr>)}</tbody></table>
+                <table><thead><tr><th>ID</th><th>User</th><th>창고번호</th><th>재고</th><th>상태</th></tr></thead><tbody>{accounts.map((a) => <tr key={a.id}><td>{a.id}</td><td>{a.userId}</td><td>{a.accountNumber}</td><td>{formatMoney(a.balance)}</td><td><span className={`status ${String(a.status).toLowerCase()}`}>{String(a.status)}</span></td></tr>)}</tbody></table>
               </div>
             </div>
 
             <div className="table-panel">
-              <div className="panel-head"><h2>최근 거래</h2><span>{transactions.length}건</span></div>
-              <div className="timeline">{transactions.slice(0, 8).map((t) => <div className="timeline-item" key={t.id}><div><strong>{t.type}</strong><p>{t.memo || "-"} · {t.fromAccountNumber || "외부"} → {t.toAccountNumber || "-"}</p></div><b>{formatMoney(t.amount)}</b></div>)}</div>
+              <div className="panel-head"><h2>최근 입출고</h2><span>{transactions.length}건</span></div>
+              <div className="timeline">{transactions.slice(0, 8).map((t) => <div className="timeline-item" key={t.id}><div><strong>{t.type === "DEPOSIT" ? "입고" : t.type === "WITHDRAW" ? "출고" : t.type}</strong><p>{t.memo || "-"} · 유통기한: {t.expiryDate || "없음"}</p></div><b>{formatMoney(t.amount)}</b></div>)}</div>
             </div>
 
             <div className="table-panel">
@@ -194,7 +194,7 @@ export default function AdminPage() {
         </main>
 
         <footer className="app-footer">
-          <span>충정은행 분산 시스템 실습</span>
+          <span>신선마켓 유통기한 검증 시스템</span>
           <span>Admin 3001 · API 3004 · Redis 6379 · MariaDB 3306</span>
         </footer>
       </div>

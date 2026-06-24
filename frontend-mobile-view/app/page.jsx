@@ -8,7 +8,7 @@ function money(value) {
   return Number(value || 0).toLocaleString("ko-KR") + "원";
 }
 function txLabel(type) {
-  return { DEPOSIT: "입금", WITHDRAW: "출금", TRANSFER_OUT: "송금", TRANSFER_IN: "입금" }[type] || type;
+  return { DEPOSIT: "입고", WITHDRAW: "출고", TRANSFER_OUT: "이동(출)", TRANSFER_IN: "이동(입)" }[type] || type;
 }
 function errorOf(...items) {
   return items.find((item) => item?.error)?.error?.message || "";
@@ -32,10 +32,10 @@ export default function MobileViewPage() {
       <main className="phone-bg">
         <section className="phone-card auth-card">
           <div className="status-bar"><span>9:41</span><span>5G 100%</span></div>
-          <div className="app-mark">충</div>
-          <p className="eyebrow">CHUNGJEONG BANK</p>
-          <h1>빠르고 안전한<br />모바일 뱅킹</h1>
-          <p className="lead">조회는 모바일 조회 서버, 거래는 별도 거래 서버에서 처리됩니다. 로그인 세션은 Redis에 저장됩니다.</p>
+          <div className="app-mark">신</div>
+          <p className="eyebrow">FRESH MARKET LOGISTICS</p>
+          <h1>빠르고 안전한<br />신선마켓 물류</h1>
+          <p className="lead">조회는 모바일 조회 서버, 입출고 거래는 별도 거래 서버에서 처리됩니다. 로그인 세션은 Redis에 저장됩니다.</p>
 
           <div className="segmented">
             <button className={mode === "login" ? "active" : ""} onClick={() => setMode("login")}>로그인</button>
@@ -69,36 +69,44 @@ export default function MobileViewPage() {
         </header>
 
         <section className="balance-card">
-          <div className="card-top"><span>충정 주거래 계좌</span><b>{account.data?.status || "-"}</b></div>
+          <div className="card-top"><span>신선마켓 창고 재고</span><b>{account.data?.status || "-"}</b></div>
           <h2>{account.isLoading ? "조회 중" : money(account.data?.balance)}</h2>
-          <p>{account.data?.accountNumber || "계좌 정보를 불러오는 중입니다"}</p>
+          <p>{account.data?.accountNumber || "창고 정보를 불러오는 중입니다"}</p>
           <div className="quick-actions">
-            <a href="/action">송금</a><a href="/action">입금</a><a href="/action">출금</a>
+            <a href="/action">입고</a><a href="/action">출고</a><a href="/action">이동</a>
           </div>
         </section>
 
         <section className="notice-card">
-          <div><strong>Redis 세션 공유</strong><p>조회 서버 3002에서 로그인해도 거래 서버 3003에서 같은 인증 상태를 사용합니다.</p></div>
+          <div><strong>유통기한 검증 시스템</strong><p>입고 시 오늘 날짜 이하의 유통기한은 400 오류로 거부됩니다. 내일 이후 날짜만 입고 가능합니다.</p></div>
           <span>LIVE</span>
         </section>
 
         <section className="section-block">
-          <div className="section-head"><h2>최근 송금 대상</h2><a href="/action">관리</a></div>
+          <div className="section-head"><h2>최근 이동 대상 창고</h2><a href="/action">관리</a></div>
           <div className="recipient-row">
             {(recentList.length ? recentList : ["110-100-000002", "110-100-000003", "110-100-000004"]).map((item, idx) => <div className="recipient" key={item + idx}><span>{idx + 1}</span><p>{item}</p></div>)}
           </div>
         </section>
 
         <section className="section-block">
-          <div className="section-head"><h2>거래내역</h2><button onClick={() => { account.refetch(); tx.refetch(); recent.refetch(); }}>새로고침</button></div>
-          {latest && <div className="latest-card"><span>최근 거래</span><strong>{txLabel(latest.type)}</strong><b>{money(latest.amount)}</b><p>{latest.memo || "메모 없음"}</p></div>}
+          <div className="section-head"><h2>입출고 내역</h2><button onClick={() => { account.refetch(); tx.refetch(); recent.refetch(); }}>새로고침</button></div>
+          {latest && <div className="latest-card"><span>최근 입출고</span><strong>{txLabel(latest.type)}</strong><b>{money(latest.amount)}</b><p>유통기한: {latest.expiryDate || "없음"} · {latest.memo || "메모 없음"}</p></div>}
           <div className="tx-list">
-            {transactions.slice(0, 8).map((item) => <div className="tx-item" key={item.id}><div><strong>{txLabel(item.type)}</strong><p>{item.memo || item.createdAt}</p></div><b>{money(item.amount)}</b></div>)}
-            {!transactions.length && <p className="empty">거래내역이 없습니다.</p>}
+            {transactions.slice(0, 8).map((item) => (
+              <div className="tx-item" key={item.id}>
+                <div>
+                  <strong>{txLabel(item.type)}</strong>
+                  <p>{item.expiryDate ? `유통기한: ${item.expiryDate}` : item.createdAt}</p>
+                </div>
+                <b>{money(item.amount)}</b>
+              </div>
+            ))}
+            {!transactions.length && <p className="empty">입출고 내역이 없습니다.</p>}
           </div>
         </section>
 
-        <nav className="bottom-nav"><span className="active">홈</span><a href="/action">거래</a><span>내역</span><span>설정</span></nav>
+        <nav className="bottom-nav"><span className="active">홈</span><a href="/action">입출고</a><span>내역</span><span>설정</span></nav>
       </section>
     </main>
   );

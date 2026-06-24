@@ -2,6 +2,7 @@ package com.example.mobilebank.domain;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -32,6 +33,9 @@ public class TransactionRecord {
     @Column(length = 120)
     private String memo;
 
+    @Column(name = "expiry_date")
+    private LocalDate expiryDate;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -44,6 +48,18 @@ public class TransactionRecord {
         this.fromAccountNumber = fromAccountNumber;
         this.toAccountNumber = toAccountNumber;
         this.memo = memo;
+        this.expiryDate = null;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public TransactionRecord(User user, TransactionType type, BigDecimal amount, String fromAccountNumber, String toAccountNumber, String memo, LocalDate expiryDate) {
+        this.user = user;
+        this.type = type;
+        this.amount = amount;
+        this.fromAccountNumber = fromAccountNumber;
+        this.toAccountNumber = toAccountNumber;
+        this.memo = memo;
+        this.expiryDate = expiryDate;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -54,5 +70,6 @@ public class TransactionRecord {
     public String getFromAccountNumber() { return fromAccountNumber; }
     public String getToAccountNumber() { return toAccountNumber; }
     public String getMemo() { return memo; }
+    public LocalDate getExpiryDate() { return expiryDate; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

@@ -35,6 +35,20 @@ export function useBankMutation(path) {
     }
   });
 }
+// 신선마켓 입고 전용 훅: expiryDate를 포함한 /bank/deposit 요청을 처리합니다.
+export function useInboundMutation() {
+  const token = useAuthStore((s) => s.token);
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ amount, memo, expiryDate }) =>
+      apiRequest("/bank/deposit", { token, method: "POST", body: { amount, memo, expiryDate } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["account"] });
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["recentRecipients"] });
+    }
+  });
+}
 export function useAdminDashboard() {
   const token = useAuthStore((s) => s.token);
   return useQuery({ queryKey: ["adminDashboard"], enabled: !!token, queryFn: () => apiRequest("/admin/dashboard", { token }) });

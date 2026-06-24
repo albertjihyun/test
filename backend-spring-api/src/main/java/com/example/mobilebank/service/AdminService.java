@@ -38,7 +38,7 @@ public class AdminService {
                 userRepository.count(), accountRepository.count(), txRepository.count(),
                 userRepository.findAll().stream().map(u -> Map.of("id", u.getId(), "username", u.getUsername(), "name", u.getName(), "role", u.getRole(), "status", u.getStatus())).toList(),
                 accountRepository.findAll().stream().map(a -> Map.of("id", a.getId(), "userId", a.getUser().getId(), "accountNumber", a.getAccountNumber(), "balance", a.getBalance(), "status", a.getStatus())).toList(),
-                txRepository.findTop50ByOrderByCreatedAtDesc().stream().map(t -> Map.of("id", t.getId(), "type", t.getType(), "amount", t.getAmount(), "fromAccountNumber", t.getFromAccountNumber() == null ? "" : t.getFromAccountNumber(), "toAccountNumber", t.getToAccountNumber() == null ? "" : t.getToAccountNumber(), "memo", t.getMemo() == null ? "" : t.getMemo(), "createdAt", t.getCreatedAt().toString())).toList(), redis.auditLogs()
+                txRepository.findTop50ByOrderByCreatedAtDesc().stream().map(t -> Map.of("id", t.getId(), "type", t.getType(), "amount", t.getAmount(), "fromAccountNumber", t.getFromAccountNumber() == null ? "" : t.getFromAccountNumber(), "toAccountNumber", t.getToAccountNumber() == null ? "" : t.getToAccountNumber(), "memo", t.getMemo() == null ? "" : t.getMemo(), "expiryDate", t.getExpiryDate() == null ? "" : t.getExpiryDate().toString(), "createdAt", t.getCreatedAt().toString())).toList(), redis.auditLogs()
         );
         try { redis.cacheDashboard(objectMapper.writeValueAsString(res)); } catch (Exception ignored) {}
         return res;

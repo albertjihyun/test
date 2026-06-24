@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -47,12 +48,15 @@ public class BankService {
 
     @Transactional
     public BankResult deposit(Long userId, MoneyRequest r) {
+        if (r.expiryDate() != null && !r.expiryDate().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("유통기한이 지난 상품은 입고할 수 없습니다.");
+        }
         Account a = primaryLocked(userId);
         assertActive(a);
         a.deposit(r.amount());
-        txRepository.save(new TransactionRecord(a.getUser(), TransactionType.DEPOSIT, r.amount(), null, a.getAccountNumber(), r.memo()));
-        redis.evictAccount(userId); redis.evictDashboard(); redis.audit("DEPOSIT userId=" + userId + " amount=" + r.amount());
-        return new BankResult("입금 완료", toAccount(a));
+        txRepository.save(new TransactionRecord(a.getUser(), TransactionType.DEPOSIT, r.amount(), null, a.getAccountNumber(), r.memo(), r.expiryDate()));
+        redis.evictAccount(userId); redis.evictDashboard(); redis.audit("INBOUND userId=" + userId + " amount=" + r.amount() + " expiryDate=" + r.expiryDate());
+        return new BankResult("입고 완료", toAccount(a));
     }
 
     @Transactional
@@ -103,5 +107,5 @@ public class BankService {
     private void ensureBalance(Account a, BigDecimal amount) { if (a.getBalance().compareTo(amount) < 0) throw new IllegalArgumentException("INSUFFICIENT_BALANCE"); }
     private void assertActive(Account a) { if (a.getStatus() != AccountStatus.ACTIVE) throw new IllegalArgumentException("ACCOUNT_CLOSED"); }
     private AccountResponse toAccount(Account a) { return new AccountResponse(a.getId(), a.getAccountNumber(), a.getBalance(), a.getStatus().name()); }
-    private TransactionResponse toTx(TransactionRecord t) { return new TransactionResponse(t.getId(), t.getType().name(), t.getAmount(), t.getFromAccountNumber(), t.getToAccountNumber(), t.getMemo(), t.getCreatedAt()); }
+    private TransactionResponse toTx(TransactionRecord t) { return new TransactionResponse(t.getId(), t.getType().name(), t.getAmount(), t.getFromAccountNumber(), t.getToAccountNumber(), t.getMemo(), t.getExpiryDate(), t.getCreatedAt()); }
 }
